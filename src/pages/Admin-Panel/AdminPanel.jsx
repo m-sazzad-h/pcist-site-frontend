@@ -5,6 +5,7 @@ import { MdEventAvailable, MdOutlineAutorenew } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 import { CiMemoPad } from "react-icons/ci";
 import { BiHistory } from "react-icons/bi";
+import { FaFileInvoice } from "react-icons/fa";
 
 const AdminPanel = () => {
   return (
@@ -70,6 +71,15 @@ const AdminPanel = () => {
             {/*<img className='w-5 h-5' src={} alt="" />*/}
             <BiHistory />
             <p className="hidden md:block">Pad History</p>
+          </NavLink>
+
+          <NavLink
+            className="flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-1"
+            to="/admin-panel/create-invoice"
+          >
+            {/*<img className='w-5 h-5' src={} alt="" />*/}
+            <FaFileInvoice />
+            <p className="hidden md:block">Create Invoice</p>
           </NavLink>
 
           <NavLink
