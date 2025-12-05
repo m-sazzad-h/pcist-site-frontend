@@ -183,15 +183,8 @@ const InvoiceSend = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2">
             <h4 className="text-sm font-medium">Products / Items</h4>
-            <button
-              type="button"
-              onClick={addProduct}
-              className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 border rounded text-sm hover:bg-green-100"
-            >
-              <FiPlusCircle /> Add item
-            </button>
           </div>
 
           <div className="space-y-3">
@@ -293,6 +286,14 @@ const InvoiceSend = () => {
                 </div>
               </div>
             ))}
+
+            <button
+              type="button"
+              onClick={addProduct}
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 border rounded text-sm hover:bg-green-100 w-full sm:w-auto"
+            >
+              <FiPlusCircle /> Add item
+            </button>
           </div>
         </div>
 
