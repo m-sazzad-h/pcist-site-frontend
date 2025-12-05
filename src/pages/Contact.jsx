@@ -39,7 +39,7 @@ const Contact = () => {
           >
             <FaPhoneAlt className='mx-auto text-3xl text-orange-500 mb-4' />
             <h3 className='text-xl font-semibold mb-2'>Phone</h3>
-            <p className='text-gray-600'>+880 123 456 789</p>
+            <p className='text-gray-600'>+880 1537-624875</p>
           </motion.div>
 
           <motion.div 
@@ -48,7 +48,7 @@ const Contact = () => {
           >
             <FaEnvelope className='mx-auto text-3xl text-orange-500 mb-4' />
             <h3 className='text-xl font-semibold mb-2'>Email</h3>
-            <p className='text-gray-600'>info@club.com</p>
+            <p className='text-gray-600'>pcist25@gmail.com</p>
           </motion.div>
 
           <motion.div 
@@ -57,7 +57,7 @@ const Contact = () => {
           >
             <FaMapMarkerAlt className='mx-auto text-3xl text-orange-500 mb-4' />
             <h3 className='text-xl font-semibold mb-2'>Address</h3>
-            <p className='text-gray-600'>123 Club Street, Dhaka, Bangladesh</p>
+            <p className='text-gray-600'>House # 54, Road # 15/A(IST Campus), Dhanmondi Dhaka, Bangladesh</p>
           </motion.div>
         </motion.div>
 
