@@ -3,7 +3,7 @@ import React, { useMemo, useState } from "react";
 import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
-import { FiPlusCircle, FiTrash2, FiSend } from "react-icons/fi";
+import { FiPlusCircle, FiTrash2, FiDownload } from "react-icons/fi";
 import { motion } from "framer-motion";
 
 const currencyFmt = (n) => {
@@ -31,8 +31,6 @@ const InvoiceSend = () => {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      receiverEmail: "",
-      subject: "Invoice from pcIST",
       products: [defaultProduct],
       authorizerName: "",
       authorizerDesignation: "",
@@ -83,8 +81,6 @@ const InvoiceSend = () => {
 
     const payload = {
       slug,
-      receiverEmail: data.receiverEmail,
-      subject: data.subject || "Invoice from pcIST",
       products: data.products.map((p) => ({
         description: p.description,
         quantity: p.quantity ? Number(p.quantity) : 1,
@@ -98,27 +94,45 @@ const InvoiceSend = () => {
     };
 
     try {
-      const res = await axios.post(`${url}/user/invoice/send`, payload, {
+      const res = await axios.post(`${url}/user/invoice/download`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
           "x-user-slug": slug,
           "x-slug": slug,
         },
+        responseType: "blob", // Expect PDF file
       });
 
-      const d = res.data || {};
+      // Create a download link for the PDF
+      const blob = new Blob([res.data], { type: "application/pdf" });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+
+      // Extract filename from response headers or use default
+      const contentDisposition = res.headers["content-disposition"];
+      let filename = "invoice.pdf";
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (filenameMatch) filename = filenameMatch[1];
+      }
+
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+
       setApiSuccess({
-        message: d.message || "Invoice email sent successfully",
-        invoiceId: d.invoiceId,
-        serial: d.serial,
-        issueDate: d.issueDate,
-        total: d.total,
+        message: "Invoice downloaded successfully",
+        invoiceId: res.headers["x-invoice-id"],
+        serial: res.headers["x-invoice-serial"],
+        issueDate: res.headers["x-invoice-date"],
+        total: totals.total,
       });
 
       reset({
-        receiverEmail: "",
-        subject: "Invoice from pcIST",
         products: [defaultProduct],
         authorizerName: "",
         authorizerDesignation: "",
@@ -129,7 +143,7 @@ const InvoiceSend = () => {
     } catch (err) {
       console.error(err);
       setApiError(
-        err?.response?.data?.message || "Failed to send invoice. Try again."
+        err?.response?.data?.message || "Failed to download invoice. Try again."
       );
     }
   };
@@ -144,7 +158,7 @@ const InvoiceSend = () => {
   return (
     <div className="bg-white p-4 sm:p-6 rounded-lg shadow mt-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg sm:text-xl font-semibold">Send Invoice</h3>
+        <h3 className="text-lg sm:text-xl font-semibold">Create Invoice</h3>
       </div>
 
       {apiSuccess && (
@@ -168,41 +182,6 @@ const InvoiceSend = () => {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Receiver Email <span className="text-red-400">*</span>
-            </label>
-            <input
-              type="email"
-              {...register("receiverEmail", {
-                required: "Receiver email is required",
-              })}
-              className={`mt-1 block w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 ${
-                errors.receiverEmail ? "border-red-300" : ""
-              }`}
-              placeholder="recipient@example.com"
-            />
-            {errors.receiverEmail && (
-              <p className="text-xs text-red-600 mt-1">
-                {errors.receiverEmail.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Subject
-            </label>
-            <input
-              type="text"
-              {...register("subject")}
-              className="mt-1 block w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-              placeholder="Invoice from pcIST"
-            />
-          </div>
-        </div>
-
         <div>
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-sm font-medium">Products / Items</h4>
@@ -397,8 +376,8 @@ const InvoiceSend = () => {
               disabled={isSubmitting}
               className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
             >
-              {isSubmitting ? <ClipLoader size={16} /> : <FiSend />}
-              <span>{isSubmitting ? "Sending..." : "Send Invoice"}</span>
+              {isSubmitting ? <ClipLoader size={16} color="#fff" /> : <FiDownload />}
+              <span>{isSubmitting ? "Generating..." : "Download Invoice"}</span>
             </button>
           </div>
         </div>
